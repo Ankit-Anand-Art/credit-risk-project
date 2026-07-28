@@ -16,7 +16,7 @@ from sqlalchemy.engine import URL
 
 # ---- EDIT THESE to match your local MySQL setup (same as load_data.py) ----
 DB_USER = "root"
-DB_PASSWORD = "aAnand@4"
+DB_PASSWORD = "Your_Password"
 DB_HOST = "localhost"
 DB_PORT = "3306"
 DB_NAME = "credit_risk"
