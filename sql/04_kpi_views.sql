@@ -1,13 +1,10 @@
-USE credit_risk
--- ============================================================
--- 04_kpi_views.sql  (MySQL 8.0+)
--- All risk KPIs as views, so Power BI just points at these instead
--- of raw tables. Requires MySQL 8.0+ for window functions and CTEs.
--- ============================================================
+-- 04_kpi_views.sql
 
--- ------------------------------------------------------------
+USE credit_risk
+
+
 -- A) Overall & monthly default rate
--- ------------------------------------------------------------
+    
 CREATE OR REPLACE VIEW kpi_default_rate_overall AS
 SELECT
     ROUND(SUM(CASE WHEN loan_status = 'DEFAULTED' THEN 1 ELSE 0 END) / COUNT(*), 4) AS default_rate,
@@ -37,9 +34,9 @@ FROM stg_loan l
 JOIN stg_customer c ON c.customer_id = l.customer_id
 GROUP BY 1, 2, 3;
 
--- ------------------------------------------------------------
+
 -- B) Delinquency rate, bucketed (30/60/90+ DPD)
--- ------------------------------------------------------------
+
 CREATE OR REPLACE VIEW kpi_delinquency_buckets AS
 SELECT
     dpd_bucket,
@@ -49,10 +46,9 @@ SELECT
 FROM stg_payments
 GROUP BY dpd_bucket;
 
--- ------------------------------------------------------------
--- C) Portfolio at Risk (PAR): outstanding balance of delinquent
---    loans / total outstanding balance.
--- ------------------------------------------------------------
+
+-- C) Portfolio at Risk (PAR): outstanding balance of delinquent loans / total outstanding balance.
+
 CREATE OR REPLACE VIEW kpi_portfolio_at_risk AS
 WITH loan_balances AS (
     SELECT
@@ -71,9 +67,9 @@ SELECT
     SUM(outstanding_balance) AS total_outstanding
 FROM loan_balances;
 
--- ------------------------------------------------------------
+
 -- D) Exposure at Default (EAD) & Loss Given Default (LGD)
--- ------------------------------------------------------------
+
 CREATE OR REPLACE VIEW kpi_ead_lgd AS
 WITH loan_exposure AS (
     SELECT
@@ -95,18 +91,17 @@ SELECT
 FROM loan_exposure
 WHERE loan_status = 'DEFAULTED';
 
--- ------------------------------------------------------------
+
 -- E) Recovery rate (1 - LGD, portfolio level)
--- ------------------------------------------------------------
+
 CREATE OR REPLACE VIEW kpi_recovery_rate AS
 SELECT
     1 - ROUND(SUM(ead) / NULLIF(SUM(loan_amount), 0), 4) AS recovery_rate
 FROM kpi_ead_lgd;
 
--- ------------------------------------------------------------
--- F) Vintage / cohort analysis: default rate by origination month,
---    tracked over months-on-book.
--- ------------------------------------------------------------
+
+-- F) Vintage / cohort analysis: default rate by origination month, tracked over months-on-book.
+
 CREATE OR REPLACE VIEW kpi_vintage_analysis AS
 SELECT
     CAST(DATE_FORMAT(l.origination_date, '%Y-%m-01') AS DATE) AS vintage_month,
@@ -124,9 +119,9 @@ JOIN stg_payments p ON p.loan_id = l.loan_id
 GROUP BY 1, 2
 ORDER BY 1, 2;
 
--- ------------------------------------------------------------
+
 -- G) Approval-to-default funnel by region/income band/loan type
--- ------------------------------------------------------------
+
 CREATE OR REPLACE VIEW kpi_funnel AS
 SELECT
     c.region,
@@ -140,9 +135,9 @@ JOIN stg_customer c ON c.customer_id = l.customer_id
 GROUP BY 1, 2, 3
 ORDER BY default_rate DESC;
 
--- ============================================================
--- H) Window functions (deliberately included — common interview ask)
--- ============================================================
+
+-- H) Window functions
+
 
 -- H1) RANK top-N riskiest customers by total exposure at default
 CREATE OR REPLACE VIEW kpi_top_risky_customers AS
