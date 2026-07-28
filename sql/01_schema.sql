@@ -1,11 +1,10 @@
-CREATE DATABASE credit_risk;
-USE credit_risk
--- ============================================================
--- 01_schema.sql  (MySQL 8.0+)
--- Creates a star-ish schema for the credit risk analytics project.
+-- 01_schema.sql
+-- Creates a star-ish schema for the credit risk analytics.
 -- Run: mysql -u root -p credit_risk < 01_schema.sql
 -- (create the database first: CREATE DATABASE credit_risk;)
--- ============================================================
+
+CREATE DATABASE credit_risk;
+USE credit_risk
 
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS fact_payments;
@@ -24,10 +23,6 @@ CREATE TABLE dim_customer (
     signup_date     DATE
 ) ENGINE=InnoDB;
 
--- Date dimension: needed for Power BI time intelligence (YoY, MoM, etc.)
--- Populated from data/dim_date.csv by load_data.py (not via SQL — MySQL's
--- recursive-CTE recursion-depth default makes a 2000+ day date spine
--- annoying to generate in pure SQL, so Python does it once, cleanly).
 CREATE TABLE dim_date (
     date_key      DATE PRIMARY KEY,
     day_num       INT,
