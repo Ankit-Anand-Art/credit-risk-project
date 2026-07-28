@@ -12,7 +12,7 @@ A machine learning project that predicts the creditworthiness of loan applicants
 
 ## Tech Stack
 
-* **Language:** Python 3.x
+* **Language:** Python 3.1+
 * **Libraries:** Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn
 * **Development Environment:** Visual Studio Code
 * **Version Control:** Git & GitHub
