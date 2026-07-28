@@ -1,11 +1,7 @@
 """
 run_query.py
 -------------
-Bypasses MySQL Workbench's client-side read timeout (which can't be found/
-changed in some Workbench versions) by running queries directly through
-Python with an explicit long timeout. Uses the same connection details as
-load_data.py.
-
+Bypasses MySQL Workbench's client-side read timeout (which can't be found/changed in some Workbench versions) by running queries directly.
 Run:
     python run_query.py
 """
@@ -14,13 +10,11 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import URL
 
-# ---- EDIT THESE to match your local MySQL setup (same as load_data.py) ----
 DB_USER = "root"
 DB_PASSWORD = "Your_Password"
 DB_HOST = "localhost"
 DB_PORT = "3306"
 DB_NAME = "credit_risk"
-# -----------------------------------------------------------------------------
 
 url = URL.create(
     "mysql+pymysql",
@@ -30,9 +24,9 @@ url = URL.create(
     port=int(DB_PORT),
     database=DB_NAME,
 )
-# connect_timeout: time to establish connection
-# read_timeout / write_timeout: time allowed per query — set high since
-# some KPI views join the full 1.3M-row fact_payments table.
+
+
+
 engine = create_engine(
     url,
     connect_args={"connect_timeout": 30, "read_timeout": 900, "write_timeout": 900},
