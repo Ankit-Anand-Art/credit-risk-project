@@ -1,22 +1,3 @@
-"""
-generate_data.py
------------------
-Generates synthetic but realistic credit-risk data:
-  - dim_customer.csv
-  - dim_loan.csv
-  - fact_payments.csv
-
-Why synthetic instead of Kaggle? You get a schema you fully control (matches
-the ER diagram exactly), reproducible row counts, and no download/login step.
-If you'd rather use a real Kaggle dataset ("Lending Club Loan Data" or
-"Home Credit Default Risk"), skip this script and adapt 03_cleaning_views.sql
-column names instead.
-
-Run:
-    pip install pandas faker numpy --break-system-packages   (or in a venv)
-    python generate_data.py
-"""
-
 import numpy as np
 import pandas as pd
 from faker import Faker
@@ -38,9 +19,8 @@ EMPLOYMENT = ["Salaried", "Self-Employed", "Business Owner", "Unemployed", "Reti
 LOAN_TYPES = ["Personal", "Auto", "Home", "Business", "Education"]
 INCOME_BANDS = ["<25k", "25k-50k", "50k-75k", "75k-100k", "100k+"]
 
-# ---------------------------------------------------------------------------
 # 1. dim_customer
-# ---------------------------------------------------------------------------
+
 customers = []
 for cid in range(1, N_CUSTOMERS + 1):
     age = int(np.clip(np.random.normal(40, 12), 21, 75))
@@ -66,10 +46,10 @@ for cid in range(1, N_CUSTOMERS + 1):
     })
 dim_customer = pd.DataFrame(customers)
 
-# ---------------------------------------------------------------------------
+
 # 2. dim_loan  (risk baked in: lower income band / self-employed / young age
 #    -> higher default probability, so segmentation KPIs later look real)
-# ---------------------------------------------------------------------------
+
 def days_between(d1, d2):
     return (d2 - d1).days
 
@@ -114,9 +94,9 @@ for lid in range(1, N_LOANS + 1):
     })
 dim_loan = pd.DataFrame(loans)
 
-# ---------------------------------------------------------------------------
+
 # 3. fact_payments  (one row per scheduled monthly installment)
-# ---------------------------------------------------------------------------
+
 payment_rows = []
 payment_id = 1
 today = date(2025, 6, 1)  # "as of" date for the dataset
@@ -173,17 +153,17 @@ dim_loan_export["loan_status"] = dim_loan_export["loan_id"].apply(
     lambda x: "DEFAULTED" if x in defaulted_loan_ids else "ACTIVE"
 )
 
-# ---------------------------------------------------------------------------
+
 # 4. Save
-# ---------------------------------------------------------------------------
+
 dim_customer.to_csv("../data/dim_customer.csv", index=False)
 dim_loan_export.to_csv("../data/dim_loan.csv", index=False)
 fact_payments.to_csv("../data/fact_payments.csv", index=False)
 
-# ---------------------------------------------------------------------------
+
 # 5. dim_date — generated here (not in SQL) to avoid MySQL recursion-depth
 #    limits on generate_series-style date spines.
-# ---------------------------------------------------------------------------
+
 date_range = pd.date_range("2021-01-01", "2026-12-31", freq="D")
 dim_date = pd.DataFrame({"date_key": date_range})
 dim_date["day_num"] = dim_date["date_key"].dt.day
