@@ -1,15 +1,3 @@
-"""
-logistic_regression_stretch.py  (OPTIONAL, step 9 in the guide)
------------------------------------------------------------------
-Trains a basic logistic regression to predict probability of default
-per loan, then writes the score back to a CSV you can load into Postgres
-as a new table (dim_risk_score) and join into Power BI.
-
-Run:
-    pip install pandas scikit-learn sqlalchemy pymysql --break-system-packages
-    python logistic_regression_stretch.py
-"""
-
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
