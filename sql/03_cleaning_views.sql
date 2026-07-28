@@ -1,8 +1,7 @@
--- ============================================================
--- 03_cleaning_views.sql  (MySQL 8.0+)
--- Staging views: standardize types, handle nulls, dedupe logic.
--- ============================================================
+-- 03_cleaning_views.sql
+
 USE credit_risk
+
 CREATE OR REPLACE VIEW stg_customer AS
 SELECT
     customer_id,
@@ -39,7 +38,7 @@ SELECT
     COALESCE(amount_paid, 0)  AS amount_paid,
     COALESCE(days_late, 0)    AS days_late,
     UPPER(TRIM(status))       AS status,
-    -- delinquency bucket used across several KPI views
+    
     CASE
         WHEN COALESCE(days_late, 0) = 0 THEN 'Current'
         WHEN days_late BETWEEN 1 AND 29 THEN '1-29 DPD'
